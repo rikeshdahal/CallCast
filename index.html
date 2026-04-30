@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calling Video Maker — FB Post</title>
+<link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --glass: rgba(255,255,255,0.06);
+    --border: rgba(255,255,255,0.12);
+    --accent: #34c759;
+    --red: #ff3b30;
+    --text: #f5f5f7;
+    --sub: rgba(255,255,255,0.45);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
+
+  /* ── Header ── */
+  header {
+    width: 100%;
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,10,15,0.95);
+    backdrop-filter: blur(20px);
+    position: sticky; top: 0; z-index: 100;
+  }
+  header .logo { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+  header .logo span { color: var(--accent); }
+  header .badge {
+    background: rgba(52,199,89,0.15);
+    border: 1px solid rgba(52,199,89,0.3);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* ── Main Layout ── */
+  main {
+    width: 100%;
+    max-width: 1100px;
+    padding: 32px 20px;
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+
+  /* ── Panel ── */
+  .panel {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    backdrop-filter: blur(20px);
+  }
+  .panel h3 {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--sub);
+    margin-bottom: 20px;
+  }
+
+  /* ── Form Controls ── */
+  label { display: block; font-size: 13px; color: var(--sub); margin-bottom: 6px; }
+  .field { margin-bottom: 18px; }
+  input[type=text], input[type=range] {
+    width: 100%;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    padding: 11px 14px;
+    font-size: 15px;
+    font-family: 'Nunito', sans-serif;
+    outline: none;
+    transition: border .2s;
+  }
+  input[type=text]:focus { border-color: rgba(52,199,89,0.5); }
+  input[type=range] { padding: 0; height: 4px; cursor: pointer; accent-color: var(--accent); border: none; background: transparent; }
+
+  /* Upload zones */
+  .upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: 14px;
+    padding: 22px;
+    text-align: center;
+    cursor: pointer;
+    transition: all .25s;
+    position: relative;
+  }
+  .upload-zone:hover { border-color: rgba(52,199,89,0.5); background: rgba(52,199,89,0.04); }
+  .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .upload-zone .icon { font-size: 28px; margin-bottom: 6px; }
+  .upload-zone .hint { font-size: 12px; color: var(--sub); }
+  .upload-zone .name { font-size: 13px; color: var(--accent); margin-top: 6px; font-weight: 600; }
+
+  /* Avatar preview */
+  #avatarPreview {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border);
+    display: block;
+    margin: 10px auto 0;
+  }
+
+  /* Color pickers */
+  .color-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+  .color-swatch {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform .15s, border .15s;
+  }
+  .color-swatch.active { border-color: white; transform: scale(1.15); }
+
+  /* Buttons */
+  .btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%;
+    padding: 13px;
+    border-radius: 14px;
+    border: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+    letter-spacing: 0.2px;
+  }
+  .btn-green { background: var(--accent); color: #fff; }
+  .btn-green:hover { background: #2fb84f; transform: translateY(-1px); }
+  .btn-red { background: var(--red); color: #fff; }
+  .btn-red:hover { background: #e02d22; }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    margin-top: 10px;
+  }
+  .btn-outline:hover { background: var(--glass); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+
+  /* ── Phone Preview ── */
+  .preview-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  #phoneCanvas {
+    border-radius: 44px;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.08);
+    display: block;
+    max-width: 100%;
+  }
+
+  /* Record status */
+  .rec-status {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--sub);
+    padding: 8px 16px;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+  }
+  .rec-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #888;
+  }
+  .rec-dot.active { background: var(--red); animation: blink 1s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .progress-bar {
+    width: 100%;
+    height: 4px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 4px;
+    width: 0%;
+    transition: width .1s linear;
+  }
+
+  /* Tips */
+  .tip {
+    font-size: 12px;
+    color: var(--sub);
+    line-height: 1.6;
+    background: rgba(52,199,89,0.05);
+    border: 1px solid rgba(52,199,89,0.15);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-top: 14px;
+  }
+
+  @media (max-width: 780px) {
+    main { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">📞 Call<span>Cast</span></div>
+  <div class="badge">FB Video Maker</div>
+</header>
+
+<main>
+  <!-- Controls Panel -->
+  <div>
+    <div class="panel" style="margin-bottom:20px">
+      <h3>📁 Media</h3>
+
+      <div class="field">
+        <label>🎵 Audio File (MP3/WAV/M4A)</label>
+        <div class="upload-zone">
+          <div class="icon">🎧</div>
+          <div>Click or drag audio here</div>
+          <div class="hint">MP3, WAV, M4A supported</div>
+          <div class="name" id="audioName">No file chosen</div>
+          <input type="file" id="audioInput" accept="audio/*">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>📷 Caller Photo (optional)</label>
+        <div class="upload-zone">
+          <div class="icon">👤</div>
+          <div>Click to upload photo</div>
+          <div class="hint">JPG, PNG, WebP</div>
+          <input type="file" id="photoInput" accept="image/*">
+        </div>
+        <img id="avatarPreview" src="https://ui-avatars.com/api/?name=R&background=1a1a2e&color=34c759&size=150" alt="Avatar">
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:20px">
+      <h3>✏️ Caller Info</h3>
+      <div class="field">
+        <label>Caller Name</label>
+        <input type="text" id="callerName" value="Rikesh Dahal" placeholder="Enter name...">
+      </div>
+      <div class="field">
+        <label>Subtitle / Status</label>
+        <input type="text" id="callerSub" value="Mobile • Nepal" placeholder="e.g. Mobile • Nepal">
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:20px">
+      <h3>🎨 Theme</h3>
+      <label style="margin-bottom:10px">Background Color</label>
+      <div class="color-row" id="bgColors">
+        <div class="color-swatch active" data-color="#0a0a1a" style="background:#0a0a1a"></div>
+        <div class="color-swatch" data-color="#001a0d" style="background:#001a0d"></div>
+        <div class="color-swatch" data-color="#1a0011" style="background:#1a0011"></div>
+        <div class="color-swatch" data-color="#0d1a2e" style="background:#0d1a2e"></div>
+        <div class="color-swatch" data-color="#111111" style="background:#111111"></div>
+      </div>
+      <label style="margin-top:12px; margin-bottom:10px">Accent Color</label>
+      <div class="color-row" id="accentColors">
+        <div class="color-swatch active" data-color="#34c759" style="background:#34c759"></div>
+        <div class="color-swatch" data-color="#0a84ff" style="background:#0a84ff"></div>
+        <div class="color-swatch" data-color="#ff9f0a" style="background:#ff9f0a"></div>
+        <div class="color-swatch" data-color="#bf5af2" style="background:#bf5af2"></div>
+        <div class="color-swatch" data-color="#ff2d55" style="background:#ff2d55"></div>
+      </div>
+
+      <div class="field" style="margin-top:16px">
+        <label>Visualizer Style</label>
+        <select id="vizStyle" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid var(--border);border-radius:12px;color:white;padding:11px 14px;font-size:15px;font-family:'Nunito',sans-serif;outline:none;">
+          <option value="bars">Classic Bars</option>
+          <option value="circle">Circular Wave</option>
+          <option value="mirror">Mirror Bars</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>⚙️ Export</h3>
+      <div class="field">
+        <label>Video Quality</label>
+        <select id="qualitySelect" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid var(--border);border-radius:12px;color:white;padding:11px 14px;font-size:15px;font-family:'Nunito',sans-serif;outline:none;">
+          <option value="720">720p (Recommended)</option>
+          <option value="1080">1080p (High Quality)</option>
+          <option value="480">480p (Fast)</option>
+        </select>
+      </div>
+      <button class="btn btn-green" id="recordBtn" disabled>
+        ⏺ Start Recording
+      </button>
+      <button class="btn btn-red" id="stopBtn" disabled style="margin-top:10px">
+        ⏹ Stop & Download
+      </button>
+      <div class="tip">
+        💡 <strong>How to use:</strong> Upload audio → customize → click <em>Start Recording</em> → it plays & records → click <em>Stop</em> to download the MP4 video for your Facebook post.
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview Panel -->
+  <div class="preview-wrap">
+    <div class="rec-status">
+      <div class="rec-dot" id="recDot"></div>
+      <span id="recLabel">Preview</span>
+      <span id="recTimer" style="font-weight:700;color:white;margin-left:4px"></span>
+    </div>
+    <canvas id="phoneCanvas"></canvas>
+    <div style="width:100%;max-width:380px">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--sub);margin-top:6px">
+        <span id="timeElapsed">0:00</span>
+        <span id="timeTotal">0:00</span>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+// ── State ──
+const state = {
+  bgColor: '#0a0a1a',
+  accentColor: '#34c759',
+  callerName: 'Rikesh Dahal',
+  callerSub: 'Mobile • Nepal',
+  vizStyle: 'bars',
+  audioBuffer: null,
+  audioSrc: null,
+  avatarImg: null,
+  isRecording: false,
+  callDuration: 0,
+  callTimer: null,
+};
+
+// ── Canvas Setup ──
+const canvas = document.getElementById('phoneCanvas');
+const ctx = canvas.getContext('2d');
+const W = 390, H = 844;
+canvas.width = W; canvas.height = H;
+canvas.style.width = Math.min(W, 390) + 'px';
+canvas.style.height = Math.min(H, 844) + 'px';
+
+// ── Audio Context ──
+let audioCtx, analyser, source, audioElement;
+let frequencyData = new Uint8Array(128);
+let animFrame;
+let ripplePhase = 0;
+
+// ── Load default avatar ──
+const defaultAvatar = new Image();
+defaultAvatar.crossOrigin = 'anonymous';
+defaultAvatar.src = 'https://ui-avatars.com/api/?name=R&background=1a1a2e&color=34c759&size=300&bold=true';
+defaultAvatar.onload = () => { state.avatarImg = defaultAvatar; drawIdle(); };
+
+function drawIdle() {
+  ripplePhase += 0.03;
+  drawFrame(new Uint8Array(128));
+  if (!state.audioSrc) requestAnimationFrame(drawIdle);
+}
+drawIdle();
+
+// ── Draw Frame ──
+function drawFrame(freq) {
+  ctx.clearRect(0, 0, W, H);
+
+  // Background gradient
+  const bgGrad = ctx.createRadialGradient(W/2, H*0.35, 0, W/2, H*0.35, H*0.7);
+  const hex = state.bgColor;
+  bgGrad.addColorStop(0, shiftColor(hex, 30));
+  bgGrad.addColorStop(1, shiftColor(hex, -10));
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Subtle noise overlay
+  ctx.fillStyle = 'rgba(255,255,255,0.012)';
+  for(let i=0;i<200;i++){
+    ctx.fillRect(Math.random()*W, Math.random()*H, 1, 1);
+  }
+
+  // Status bar
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.font = '600 14px Nunito, sans-serif';
+  ctx.textAlign = 'left';
+  const now = new Date();
+  ctx.fillText(`${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`, 24, 36);
+  ctx.textAlign = 'right';
+  ctx.fillText('●●● ▲▼', W-24, 36);
+
+  // Pulsing ripple rings
+  const accent = state.accentColor;
+  const avgVol = freq.length ? freq.reduce((a,b)=>a+b,0)/freq.length/255 : 0;
+  const pulse = 1 + avgVol * 0.4;
+
+  for(let r=0;r<4;r++){
+    const phase = (ripplePhase - r*0.6) % (Math.PI*2);
+    const t = (Math.sin(phase)*0.5+0.5);
+    const radius = 90 + r*42 + t*24*pulse;
+    const alpha = (1-t)*0.25 + avgVol*0.15;
+    ctx.beginPath();
+    ctx.arc(W/2, 310, radius, 0, Math.PI*2);
+    ctx.strokeStyle = hexToRgba(accent, alpha);
+    ctx.lineWidth = 2 + (1-t)*3;
+    ctx.stroke();
+  }
+
+  // Avatar circle
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(W/2, 310, 78 + avgVol*8, 0, Math.PI*2);
+  ctx.clip();
+  if(state.avatarImg) {
+    ctx.drawImage(state.avatarImg, W/2-78, 310-78, 156, 156);
+  } else {
+    ctx.fillStyle = '#1a1a2e';
+    ctx.fillRect(W/2-78, 310-78, 156, 156);
+    ctx.fillStyle = accent;
+    ctx.font = 'bold 60px Nunito';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(state.callerName.charAt(0).toUpperCase(), W/2, 310);
+  }
+  ctx.restore();
+
+  // Avatar border glow
+  ctx.beginPath();
+  ctx.arc(W/2, 310, 80 + avgVol*8, 0, Math.PI*2);
+  ctx.strokeStyle = hexToRgba(accent, 0.6 + avgVol*0.4);
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  // Caller name
+  ctx.textBaseline = 'alphabetic';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
+  ctx.font = '700 34px Nunito, sans-serif';
+  ctx.fillText(state.callerName, W/2, 430);
+
+  // Sub text
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.font = '400 16px Nunito, sans-serif';
+  ctx.fillText(state.callerSub, W/2, 458);
+
+  // Call duration
+  const dur = formatTime(state.callDuration);
+  ctx.fillStyle = hexToRgba(accent, 0.9);
+  ctx.font = '600 15px Nunito, sans-serif';
+  ctx.fillText(state.audioSrc ? dur : 'incoming call...', W/2, 490);
+
+  // ── Visualizer ──
+  drawVisualizer(freq, avgVol, accent);
+
+  // ── Call Buttons ──
+  drawCallButtons(accent);
+
+  // Home indicator
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.beginPath();
+  ctx.roundRect(W/2-65, H-14, 130, 5, 3);
+  ctx.fill();
+}
+
+function drawVisualizer(freq, avgVol, accent) {
+  const style = state.vizStyle;
+  const vizY = 640;
+  const vizH = 80;
+
+  if(style === 'bars') {
+    const barCount = 48;
+    const barW = 4;
+    const gap = (W - 80) / barCount - barW;
+    for(let i=0;i<barCount;i++){
+      const idx = Math.floor(i * freq.length / barCount);
+      const val = freq[idx] / 255;
+      const h = Math.max(4, val * vizH);
+      const x = 40 + i*(barW+gap);
+      const alpha = 0.4 + val*0.6;
+      ctx.fillStyle = hexToRgba(accent, alpha);
+      ctx.beginPath();
+      ctx.roundRect(x, vizY - h, barW, h, 2);
+      ctx.fill();
+    }
+  } else if(style === 'mirror') {
+    const barCount = 48;
+    const barW = 4;
+    const gap = (W - 80) / barCount - barW;
+    for(let i=0;i<barCount;i++){
+      const idx = Math.floor(i * freq.length / barCount);
+      const val = freq[idx] / 255;
+      const h = Math.max(3, val * vizH * 0.5);
+      const x = 40 + i*(barW+gap);
+      const alpha = 0.35 + val*0.65;
+      ctx.fillStyle = hexToRgba(accent, alpha);
+      ctx.beginPath();
+      ctx.roundRect(x, vizY - h, barW, h, 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.roundRect(x, vizY, barW, h, 2);
+      ctx.fill();
+    }
+  } else if(style === 'circle') {
+    const cx = W/2, cy = vizY - 10;
+    const rBase = 32;
+    const pts = 64;
+    ctx.beginPath();
+    for(let i=0;i<pts;i++){
+      const idx = Math.floor(i * freq.length / pts);
+      const val = freq[idx] / 255;
+      const angle = (i / pts) * Math.PI * 2 - Math.PI/2;
+      const r = rBase + val * 38;
+      const x = cx + Math.cos(angle) * r;
+      const y = cy + Math.sin(angle) * r;
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = hexToRgba(accent, 0.85);
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+    ctx.fillStyle = hexToRgba(accent, 0.08);
+    ctx.fill();
+  }
+}
+
+function drawCallButtons(accent) {
+  const btnY = 740;
+  const buttons = [
+    { x: W/2-130, icon: '🔇', label: 'mute', color: 'rgba(255,255,255,0.15)' },
+    { x: W/2, icon: '📵', label: 'end', color: '#ff3b30', big: true },
+    { x: W/2+130, icon: '🔊', label: 'speaker', color: 'rgba(255,255,255,0.15)' },
+  ];
+
+  buttons.forEach(b => {
+    const r = b.big ? 40 : 34;
+    ctx.beginPath();
+    ctx.arc(b.x, btnY, r, 0, Math.PI*2);
+    ctx.fillStyle = b.color;
+    ctx.fill();
+    ctx.font = `${b.big ? 26 : 22}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(b.icon, b.x, btnY);
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.font = '11px Nunito, sans-serif';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(b.label, b.x, btnY + r + 16);
+  });
+
+  // Answer button
+  ctx.beginPath();
+  ctx.arc(W/2+130, btnY, 34, 0, Math.PI*2);
+  ctx.fillStyle = accent;
+  ctx.fill();
+  ctx.font = '22px serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('📞', W/2+130, btnY);
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.font = '11px Nunito, sans-serif';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText('answer', W/2+130, btnY + 50);
+}
+
+// ── Audio Setup ──
+function setupAudio(file) {
+  if(audioCtx) { audioCtx.close(); audioCtx = null; }
+  if(audioElement) { audioElement.pause(); audioElement.src = ''; }
+
+  const url = URL.createObjectURL(file);
+  audioElement = new Audio();
+  audioElement.src = url;
+  audioElement.crossOrigin = 'anonymous';
+
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 256;
+  source = audioCtx.createMediaElementSource(audioElement);
+  source.connect(analyser);
+  analyser.connect(audioCtx.destination);
+  frequencyData = new Uint8Array(analyser.frequencyBinCount);
+
+  state.audioSrc = url;
+  document.getElementById('recordBtn').disabled = false;
+
+  audioElement.addEventListener('loadedmetadata', () => {
+    document.getElementById('timeTotal').textContent = formatTime(audioElement.duration);
+  });
+  audioElement.addEventListener('timeupdate', () => {
+    const p = audioElement.currentTime / audioElement.duration * 100;
+    document.getElementById('progressFill').style.width = p + '%';
+    document.getElementById('timeElapsed').textContent = formatTime(audioElement.currentTime);
+  });
+}
+
+function renderLoop() {
+  if(analyser) analyser.getByteFrequencyData(frequencyData);
+  ripplePhase += 0.03;
+  drawFrame(frequencyData);
+  animFrame = requestAnimationFrame(renderLoop);
+}
+
+// ── Recording ──
+let mediaRecorder, chunks = [];
+
+async function startRecording() {
+  if(!state.audioSrc) return;
+  if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+
+  state.isRecording = true;
+  state.callDuration = 0;
+  chunks = [];
+
+  cancelAnimationFrame(animFrame);
+  renderLoop();
+  audioElement.currentTime = 0;
+  audioElement.play();
+
+  state.callTimer = setInterval(() => { state.callDuration++; }, 1000);
+
+  document.getElementById('recDot').classList.add('active');
+  document.getElementById('recLabel').textContent = 'REC';
+  document.getElementById('recordBtn').disabled = true;
+  document.getElementById('stopBtn').disabled = false;
+
+  const stream = canvas.captureStream(30);
+
+  // Mix audio into stream
+  const dest = audioCtx.createMediaStreamDestination();
+  source.connect(dest);
+  const audioTracks = dest.stream.getAudioTracks();
+  audioTracks.forEach(t => stream.addTrack(t));
+
+  const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
+    ? 'video/webm;codecs=vp9,opus'
+    : MediaRecorder.isTypeSupported('video/webm')
+    ? 'video/webm' : 'video/mp4';
+
+  mediaRecorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 5000000 });
+  mediaRecorder.ondataavailable = e => { if(e.data.size>0) chunks.push(e.data); };
+  mediaRecorder.start(100);
+
+  audioElement.onended = () => stopRecording();
+}
+
+function stopRecording() {
+  if(!state.isRecording) return;
+  state.isRecording = false;
+  clearInterval(state.callTimer);
+  audioElement.pause();
+  cancelAnimationFrame(animFrame);
+  mediaRecorder.stop();
+
+  mediaRecorder.onstop = () => {
+    const blob = new Blob(chunks, { type: chunks[0].type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${state.callerName.replace(/\s+/g,'_')}_call.webm`;
+    a.click();
+  };
+
+  document.getElementById('recDot').classList.remove('active');
+  document.getElementById('recLabel').textContent = 'Done!';
+  document.getElementById('recordBtn').disabled = false;
+  document.getElementById('stopBtn').disabled = true;
+
+  drawIdle();
+}
+
+// ── Event Listeners ──
+document.getElementById('audioInput').addEventListener('change', e => {
+  const f = e.target.files[0];
+  if(!f) return;
+  document.getElementById('audioName').textContent = f.name;
+  setupAudio(f);
+});
+
+document.getElementById('photoInput').addEventListener('change', e => {
+  const f = e.target.files[0];
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = new Image();
+    img.onload = () => { state.avatarImg = img; };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(f);
+});
+
+document.getElementById('callerName').addEventListener('input', e => { state.callerName = e.target.value; });
+document.getElementById('callerSub').addEventListener('input', e => { state.callerSub = e.target.value; });
+document.getElementById('vizStyle').addEventListener('change', e => { state.vizStyle = e.target.value; });
+
+// Color swatches
+document.getElementById('bgColors').addEventListener('click', e => {
+  const sw = e.target.closest('.color-swatch');
+  if(!sw) return;
+  document.querySelectorAll('#bgColors .color-swatch').forEach(s => s.classList.remove('active'));
+  sw.classList.add('active');
+  state.bgColor = sw.dataset.color;
+});
+document.getElementById('accentColors').addEventListener('click', e => {
+  const sw = e.target.closest('.color-swatch');
+  if(!sw) return;
+  document.querySelectorAll('#accentColors .color-swatch').forEach(s => s.classList.remove('active'));
+  sw.classList.add('active');
+  state.accentColor = sw.dataset.color;
+});
+
+document.getElementById('recordBtn').addEventListener('click', startRecording);
+document.getElementById('stopBtn').addEventListener('click', stopRecording);
+
+// ── Helpers ──
+function formatTime(s) {
+  s = Math.floor(s||0);
+  return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+}
+
+function hexToRgba(hex, alpha) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function shiftColor(hex, amount) {
+  let r = parseInt(hex.slice(1,3),16);
+  let g = parseInt(hex.slice(3,5),16);
+  let b = parseInt(hex.slice(5,7),16);
+  r = Math.max(0,Math.min(255,r+amount));
+  g = Math.max(0,Math.min(255,g+amount));
+  b = Math.max(0,Math.min(255,b+amount));
+  return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+}
+</script>
+</body>
+</html>
