@@ -3,614 +3,832 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calling Video Maker — FB Post</title>
-<link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+<title>CallCast — FB Video Maker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0a0a0f;
-    --glass: rgba(255,255,255,0.06);
-    --border: rgba(255,255,255,0.12);
-    --accent: #34c759;
-    --red: #ff3b30;
-    --text: #f5f5f7;
-    --sub: rgba(255,255,255,0.45);
-  }
+:root{
+  --bg:#080810;--border:rgba(255,255,255,0.08);--border-h:rgba(255,255,255,0.18);
+  --accent:#34c759;--accent-dim:rgba(52,199,89,0.12);--accent-glow:rgba(52,199,89,0.25);
+  --red:#ff3b30;--text:#f0f0f5;--text-2:rgba(240,240,245,0.55);--text-3:rgba(240,240,245,0.3);
+  --sidebar-w:370px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;top:-40%;left:-20%;width:60%;height:60%;background:radial-gradient(ellipse,rgba(52,199,89,.06) 0%,transparent 70%);pointer-events:none;z-index:0;}
+body::after{content:'';position:fixed;bottom:-30%;right:-10%;width:50%;height:50%;background:radial-gradient(ellipse,rgba(10,132,255,.05) 0%,transparent 70%);pointer-events:none;z-index:0;}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+/* ── Header ── */
+header{position:sticky;top:0;z-index:200;height:60px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,8,16,.85);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);}
+.logo{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:600;letter-spacing:-.3px;}
+.logo-icon{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#34c759,#0a84ff);display:flex;align-items:center;justify-content:center;font-size:16px;}
+.badge{padding:3px 10px;background:var(--accent-dim);border:1px solid rgba(52,199,89,.2);border-radius:20px;color:var(--accent);font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
+.step-indicator{display:flex;align-items:center;gap:6px;}
+.step-dot{width:6px;height:6px;border-radius:50%;background:var(--border-h);transition:all .3s;}
+.step-dot.done{background:var(--accent);}
+.step-dot.active{background:var(--accent);box-shadow:0 0 8px var(--accent-glow);}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Nunito', sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow-x: hidden;
-  }
+/* ── Layout ── */
+.app{position:relative;z-index:1;display:grid;grid-template-columns:var(--sidebar-w) 1fr;min-height:calc(100vh - 60px);}
 
-  /* ── Header ── */
-  header {
-    width: 100%;
-    padding: 18px 32px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border-bottom: 1px solid var(--border);
-    background: rgba(10,10,15,0.95);
-    backdrop-filter: blur(20px);
-    position: sticky; top: 0; z-index: 100;
-  }
-  header .logo { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
-  header .logo span { color: var(--accent); }
-  header .badge {
-    background: rgba(52,199,89,0.15);
-    border: 1px solid rgba(52,199,89,0.3);
-    color: var(--accent);
-    font-size: 11px;
-    font-weight: 700;
-    padding: 3px 9px;
-    border-radius: 20px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-  }
+/* ── Sidebar ── */
+.sidebar{border-right:1px solid var(--border);padding:24px 20px;overflow-y:auto;height:calc(100vh - 60px);position:sticky;top:60px;}
+.sidebar::-webkit-scrollbar{width:4px;}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:4px;}
+.section{margin-bottom:20px;}
+.section-header{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.section-title{font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);}
+.section-icon{width:24px;height:24px;border-radius:7px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font-size:12px;}
+.divider{height:1px;background:var(--border);margin:20px 0;}
+.field{margin-bottom:14px;}
+.label{font-size:12px;color:var(--text-2);margin-bottom:6px;display:block;font-weight:500;}
 
-  /* ── Main Layout ── */
-  main {
-    width: 100%;
-    max-width: 1100px;
-    padding: 32px 20px;
-    display: grid;
-    grid-template-columns: 360px 1fr;
-    gap: 28px;
-    align-items: start;
-  }
+.input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;color:var(--text);padding:10px 14px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border .2s,background .2s;}
+.input:focus{border-color:rgba(52,199,89,.4);background:rgba(52,199,89,.03);}
 
-  /* ── Panel ── */
-  .panel {
-    background: var(--glass);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 24px;
-    backdrop-filter: blur(20px);
-  }
-  .panel h3 {
-    font-size: 13px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    color: var(--sub);
-    margin-bottom: 20px;
-  }
+.upload-zone{border:1.5px dashed var(--border);border-radius:14px;padding:18px 16px;text-align:center;cursor:pointer;transition:all .25s;position:relative;background:rgba(255,255,255,.02);}
+.upload-zone:hover{border-color:rgba(52,199,89,.4);background:rgba(52,199,89,.03);}
+.upload-zone.has-file{border-color:rgba(52,199,89,.5);border-style:solid;background:rgba(52,199,89,.05);}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-icon{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:18px;}
+.upload-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;}
+.upload-sub{font-size:11px;color:var(--text-3);}
+.upload-name{font-size:12px;color:var(--accent);margin-top:6px;font-weight:600;word-break:break-all;}
 
-  /* ── Form Controls ── */
-  label { display: block; font-size: 13px; color: var(--sub); margin-bottom: 6px; }
-  .field { margin-bottom: 18px; }
-  input[type=text], input[type=range] {
-    width: 100%;
-    background: rgba(255,255,255,0.07);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    color: var(--text);
-    padding: 11px 14px;
-    font-size: 15px;
-    font-family: 'Nunito', sans-serif;
-    outline: none;
-    transition: border .2s;
-  }
-  input[type=text]:focus { border-color: rgba(52,199,89,0.5); }
-  input[type=range] { padding: 0; height: 4px; cursor: pointer; accent-color: var(--accent); border: none; background: transparent; }
+.avatar-row{display:flex;align-items:center;gap:12px;margin-top:12px;}
+#avatarSide{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid var(--border);flex-shrink:0;}
+.ainfo .np{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ainfo .sp{font-size:12px;color:var(--text-2);}
 
-  /* Upload zones */
-  .upload-zone {
-    border: 2px dashed var(--border);
-    border-radius: 14px;
-    padding: 22px;
-    text-align: center;
-    cursor: pointer;
-    transition: all .25s;
-    position: relative;
-  }
-  .upload-zone:hover { border-color: rgba(52,199,89,0.5); background: rgba(52,199,89,0.04); }
-  .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-  .upload-zone .icon { font-size: 28px; margin-bottom: 6px; }
-  .upload-zone .hint { font-size: 12px; color: var(--sub); }
-  .upload-zone .name { font-size: 13px; color: var(--accent); margin-top: 6px; font-weight: 600; }
+.color-grid{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px;}
+.swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .15s;position:relative;}
+.swatch::after{content:'';position:absolute;inset:-3px;border-radius:50%;border:2px solid transparent;transition:border .15s;}
+.swatch.active::after{border-color:white;}
+.swatch:hover{transform:scale(1.15);}
 
-  /* Avatar preview */
-  #avatarPreview {
-    width: 80px; height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid var(--border);
-    display: block;
-    margin: 10px auto 0;
-  }
+.viz-options{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.viz-opt{border:1.5px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(255,255,255,.02);}
+.viz-opt:hover{border-color:var(--border-h);}
+.viz-opt.active{border-color:rgba(52,199,89,.5);background:rgba(52,199,89,.07);}
+.viz-opt .vi{font-size:20px;margin-bottom:4px;}
+.viz-opt .vn{font-size:10px;color:var(--text-2);font-weight:500;}
+.viz-opt.active .vn{color:var(--accent);}
 
-  /* Color pickers */
-  .color-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
-  .color-swatch {
-    width: 30px; height: 30px;
-    border-radius: 50%;
-    cursor: pointer;
-    border: 2px solid transparent;
-    transition: transform .15s, border .15s;
-  }
-  .color-swatch.active { border-color: white; transform: scale(1.15); }
+.quality-chips{display:flex;gap:8px;margin-bottom:14px;}
+.chip{flex:1;padding:8px;border-radius:10px;border:1.5px solid var(--border);text-align:center;cursor:pointer;transition:all .2s;background:rgba(255,255,255,.02);font-size:12px;color:var(--text-2);font-weight:500;}
+.chip:hover{border-color:var(--border-h);}
+.chip.active{border-color:rgba(52,199,89,.5);background:rgba(52,199,89,.07);color:var(--accent);}
+.chip-l{font-size:10px;color:var(--text-3);margin-top:1px;}
 
-  /* Buttons */
-  .btn {
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    width: 100%;
-    padding: 13px;
-    border-radius: 14px;
-    border: none;
-    font-family: 'Nunito', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all .2s;
-    letter-spacing: 0.2px;
-  }
-  .btn-green { background: var(--accent); color: #fff; }
-  .btn-green:hover { background: #2fb84f; transform: translateY(-1px); }
-  .btn-red { background: var(--red); color: #fff; }
-  .btn-red:hover { background: #e02d22; }
-  .btn-outline {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text);
-    margin-top: 10px;
-  }
-  .btn-outline:hover { background: var(--glass); }
-  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px 16px;border-radius:14px;border:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;}
+.btn-primary{background:linear-gradient(135deg,#34c759,#2ab54a);color:#fff;box-shadow:0 4px 20px rgba(52,199,89,.3);}
+.btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 28px rgba(52,199,89,.4);}
+.btn-danger{background:linear-gradient(135deg,#ff3b30,#e02d22);color:#fff;box-shadow:0 4px 20px rgba(255,59,48,.3);margin-top:10px;}
+.btn-danger:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 28px rgba(255,59,48,.4);}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important;box-shadow:none!important;}
+@keyframes pulse-btn{0%,100%{box-shadow:0 4px 20px rgba(255,59,48,.3)}50%{box-shadow:0 4px 32px rgba(255,59,48,.6)}}
+.btn-danger.recording{animation:pulse-btn 2s infinite;}
 
-  /* ── Phone Preview ── */
-  .preview-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-  }
+.steps-row{display:flex;gap:8px;margin-top:16px;}
+.step-card{flex:1;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:10px;text-align:center;}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--accent-dim);border:1px solid rgba(52,199,89,.2);color:var(--accent);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;}
+.step-text{font-size:10px;color:var(--text-2);line-height:1.4;}
 
-  #phoneCanvas {
-    border-radius: 44px;
-    box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.08);
-    display: block;
-    max-width: 100%;
-  }
+/* ── Preview ── */
+.preview-area{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;gap:20px;position:relative;}
+.preview-stack{display:flex;flex-direction:column;align-items:center;gap:16px;width:100%;}
 
-  /* Record status */
-  .rec-status {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 13px; color: var(--sub);
-    padding: 8px 16px;
-    background: var(--glass);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-  }
-  .rec-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: #888;
-  }
-  .rec-dot.active { background: var(--red); animation: blink 1s infinite; }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.status-pill{display:flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:20px;font-size:12px;color:var(--text-2);font-family:'DM Mono',monospace;transition:all .3s;}
+.status-pill.recording{background:rgba(255,59,48,.08);border-color:rgba(255,59,48,.3);color:#ff6b63;}
+.rec-dot{width:7px;height:7px;border-radius:50%;background:#555;transition:all .3s;flex-shrink:0;}
+.rec-dot.live{background:var(--red);box-shadow:0 0 8px var(--red);animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
-  .progress-bar {
-    width: 100%;
-    height: 4px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 4px;
-    overflow: hidden;
-    margin-top: 4px;
-  }
-  .progress-fill {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 4px;
-    width: 0%;
-    transition: width .1s linear;
-  }
+/* ── SVG Phone ── */
+.phone-wrap{filter:drop-shadow(0 30px 60px rgba(0,0,0,.75)) drop-shadow(0 0 1px rgba(255,255,255,.05));}
+#phoneSVG{width:min(315px,76vw);height:auto;display:block;overflow:visible;}
 
-  /* Tips */
-  .tip {
-    font-size: 12px;
-    color: var(--sub);
-    line-height: 1.6;
-    background: rgba(52,199,89,0.05);
-    border: 1px solid rgba(52,199,89,0.15);
-    border-radius: 10px;
-    padding: 12px 14px;
-    margin-top: 14px;
-  }
+/* ── Progress ── */
+.progress-wrap{width:100%;max-width:300px;}
+.progress-bar{height:3px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--accent);border-radius:3px;width:0%;transition:width .1s;}
+.progress-times{display:flex;justify-content:space-between;font-size:11px;color:var(--text-3);margin-top:5px;font-family:'DM Mono',monospace;}
 
-  @media (max-width: 780px) {
-    main { grid-template-columns: 1fr; }
+/* ── Mobile overlay panel ── */
+.mobile-toggle{display:none;position:fixed;bottom:24px;right:24px;z-index:300;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#34c759,#2ab54a);border:none;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 6px 28px rgba(52,199,89,.45);align-items:center;justify-content:center;transition:transform .2s;}
+.mobile-toggle:hover{transform:scale(1.08);}
+.mobile-toggle.open{background:linear-gradient(135deg,#ff3b30,#e02d22);}
+
+/* ── Responsive ── */
+@media(max-width:920px){
+  :root{--sidebar-w:310px;}
+  #phoneSVG{width:min(270px,72vw);}
+}
+@media(max-width:720px){
+  .app{grid-template-columns:1fr;}
+
+  /* Sidebar becomes a slide-up panel */
+  .sidebar{
+    position:fixed;
+    bottom:0;left:0;right:0;
+    height:80vh;
+    z-index:250;
+    border-right:none;
+    border-top:1px solid var(--border);
+    border-radius:24px 24px 0 0;
+    background:rgba(10,10,18,.97);
+    backdrop-filter:blur(32px);
+    transform:translateY(100%);
+    transition:transform .38s cubic-bezier(.22,.8,.36,1);
+    overflow-y:auto;
+    padding:28px 20px 48px;
   }
+  .sidebar.open{transform:translateY(0);}
+  .sidebar-handle{width:40px;height:4px;border-radius:2px;background:rgba(255,255,255,.15);margin:0 auto 20px;}
+
+  .preview-area{padding:20px 16px;min-height:calc(100vh - 60px);justify-content:flex-start;padding-top:28px;}
+  #phoneSVG{width:min(260px,80vw);}
+  .badge{display:none;}
+  header{padding:0 16px;}
+  .mobile-toggle{display:flex;}
+
+  /* Overlay backdrop */
+  .sidebar-backdrop{
+    display:none;
+    position:fixed;inset:0;z-index:240;
+    background:rgba(0,0,0,.55);
+    backdrop-filter:blur(4px);
+  }
+  .sidebar-backdrop.visible{display:block;}
+}
+@media(max-width:480px){
+  #phoneSVG{width:min(230px,86vw);}
+  .preview-area{padding:16px 12px;padding-top:20px;}
+  .status-pill{font-size:11px;padding:6px 12px;}
+  .progress-wrap{max-width:240px;}
+}
+@media(max-width:360px){
+  #phoneSVG{width:min(200px,90vw);}
+}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">📞 Call<span>Cast</span></div>
-  <div class="badge">FB Video Maker</div>
+  <div class="logo">
+    <div class="logo-icon">📞</div>
+    Call<span style="color:var(--accent)">Cast</span>
+    <div class="badge">FB Video Maker</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div class="step-indicator">
+      <div class="step-dot active" id="dot1"></div>
+      <div class="step-dot" id="dot2"></div>
+      <div class="step-dot" id="dot3"></div>
+    </div>
+  </div>
 </header>
 
-<main>
-  <!-- Controls Panel -->
-  <div>
-    <div class="panel" style="margin-bottom:20px">
-      <h3>📁 Media</h3>
+<!-- Mobile sidebar backdrop -->
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
-      <div class="field">
-        <label>🎵 Audio File (MP3/WAV/M4A)</label>
-        <div class="upload-zone">
-          <div class="icon">🎧</div>
-          <div>Click or drag audio here</div>
-          <div class="hint">MP3, WAV, M4A supported</div>
-          <div class="name" id="audioName">No file chosen</div>
-          <input type="file" id="audioInput" accept="audio/*">
+<div class="app">
+
+<!-- ── Sidebar ── -->
+<aside class="sidebar" id="sidebar">
+  <!-- Mobile drag handle -->
+  <div class="sidebar-handle"></div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon">🎵</div><div class="section-title">Step 1 — Media</div></div>
+    <div class="field">
+      <div class="label">Audio File</div>
+      <div class="upload-zone" id="audioZone">
+        <input type="file" id="audioInput" accept="audio/*">
+        <div class="upload-icon">🎧</div>
+        <div class="upload-title">Drop audio here</div>
+        <div class="upload-sub">MP3 · WAV · M4A</div>
+        <div class="upload-name" id="audioName"></div>
+      </div>
+    </div>
+    <div class="field">
+      <div class="label">Caller Photo <span style="color:var(--text-3)">(optional)</span></div>
+      <div class="upload-zone" id="photoZone">
+        <input type="file" id="photoInput" accept="image/*">
+        <div class="upload-icon">👤</div>
+        <div class="upload-title">Upload photo</div>
+        <div class="upload-sub">JPG · PNG · WebP</div>
+      </div>
+      <div class="avatar-row">
+        <img id="avatarSide" src="https://ui-avatars.com/api/?name=R&background=1a2030&color=34c759&size=150&bold=true" alt="avatar">
+        <div class="ainfo">
+          <div class="np" id="namePrev">Rikesh Dahal</div>
+          <div class="sp" id="subPrev">Mobile · Nepal</div>
         </div>
-      </div>
-
-      <div class="field">
-        <label>📷 Caller Photo (optional)</label>
-        <div class="upload-zone">
-          <div class="icon">👤</div>
-          <div>Click to upload photo</div>
-          <div class="hint">JPG, PNG, WebP</div>
-          <input type="file" id="photoInput" accept="image/*">
-        </div>
-        <img id="avatarPreview" src="https://ui-avatars.com/api/?name=R&background=1a1a2e&color=34c759&size=150" alt="Avatar">
-      </div>
-    </div>
-
-    <div class="panel" style="margin-bottom:20px">
-      <h3>✏️ Caller Info</h3>
-      <div class="field">
-        <label>Caller Name</label>
-        <input type="text" id="callerName" value="Rikesh Dahal" placeholder="Enter name...">
-      </div>
-      <div class="field">
-        <label>Subtitle / Status</label>
-        <input type="text" id="callerSub" value="Mobile • Nepal" placeholder="e.g. Mobile • Nepal">
-      </div>
-    </div>
-
-    <div class="panel" style="margin-bottom:20px">
-      <h3>🎨 Theme</h3>
-      <label style="margin-bottom:10px">Background Color</label>
-      <div class="color-row" id="bgColors">
-        <div class="color-swatch active" data-color="#0a0a1a" style="background:#0a0a1a"></div>
-        <div class="color-swatch" data-color="#001a0d" style="background:#001a0d"></div>
-        <div class="color-swatch" data-color="#1a0011" style="background:#1a0011"></div>
-        <div class="color-swatch" data-color="#0d1a2e" style="background:#0d1a2e"></div>
-        <div class="color-swatch" data-color="#111111" style="background:#111111"></div>
-      </div>
-      <label style="margin-top:12px; margin-bottom:10px">Accent Color</label>
-      <div class="color-row" id="accentColors">
-        <div class="color-swatch active" data-color="#34c759" style="background:#34c759"></div>
-        <div class="color-swatch" data-color="#0a84ff" style="background:#0a84ff"></div>
-        <div class="color-swatch" data-color="#ff9f0a" style="background:#ff9f0a"></div>
-        <div class="color-swatch" data-color="#bf5af2" style="background:#bf5af2"></div>
-        <div class="color-swatch" data-color="#ff2d55" style="background:#ff2d55"></div>
-      </div>
-
-      <div class="field" style="margin-top:16px">
-        <label>Visualizer Style</label>
-        <select id="vizStyle" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid var(--border);border-radius:12px;color:white;padding:11px 14px;font-size:15px;font-family:'Nunito',sans-serif;outline:none;">
-          <option value="bars">Classic Bars</option>
-          <option value="circle">Circular Wave</option>
-          <option value="mirror">Mirror Bars</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="panel">
-      <h3>⚙️ Export</h3>
-      <div class="field">
-        <label>Video Quality</label>
-        <select id="qualitySelect" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid var(--border);border-radius:12px;color:white;padding:11px 14px;font-size:15px;font-family:'Nunito',sans-serif;outline:none;">
-          <option value="720">720p (Recommended)</option>
-          <option value="1080">1080p (High Quality)</option>
-          <option value="480">480p (Fast)</option>
-        </select>
-      </div>
-      <button class="btn btn-green" id="recordBtn" disabled>
-        ⏺ Start Recording
-      </button>
-      <button class="btn btn-red" id="stopBtn" disabled style="margin-top:10px">
-        ⏹ Stop & Download
-      </button>
-      <div class="tip">
-        💡 <strong>How to use:</strong> Upload audio → customize → click <em>Start Recording</em> → it plays & records → click <em>Stop</em> to download the MP4 video for your Facebook post.
       </div>
     </div>
   </div>
 
-  <!-- Preview Panel -->
-  <div class="preview-wrap">
-    <div class="rec-status">
-      <div class="rec-dot" id="recDot"></div>
-      <span id="recLabel">Preview</span>
-      <span id="recTimer" style="font-weight:700;color:white;margin-left:4px"></span>
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon">✏️</div><div class="section-title">Step 2 — Caller Info</div></div>
+    <div class="field"><div class="label">Name</div><input type="text" class="input" id="callerName" value="Rikesh Dahal" placeholder="Caller name…"></div>
+    <div class="field"><div class="label">Subtitle</div><input type="text" class="input" id="callerSub" value="Mobile · Nepal" placeholder="e.g. Mobile · Nepal"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon">🎨</div><div class="section-title">Step 3 — Style</div></div>
+    <div class="field">
+      <div class="label">Background</div>
+      <div class="color-grid" id="bgColors">
+        <div class="swatch active" data-color="#080818" style="background:#080818"></div>
+        <div class="swatch" data-color="#001208" style="background:#001208"></div>
+        <div class="swatch" data-color="#180010" style="background:#180010"></div>
+        <div class="swatch" data-color="#071828" style="background:#071828"></div>
+        <div class="swatch" data-color="#0a0a0a" style="background:#0a0a0a"></div>
+        <div class="swatch" data-color="#1a1200" style="background:#1a1200"></div>
+      </div>
     </div>
-    <canvas id="phoneCanvas"></canvas>
-    <div style="width:100%;max-width:380px">
+    <div class="field">
+      <div class="label">Accent</div>
+      <div class="color-grid" id="accentColors">
+        <div class="swatch active" data-color="#34c759" style="background:#34c759"></div>
+        <div class="swatch" data-color="#0a84ff" style="background:#0a84ff"></div>
+        <div class="swatch" data-color="#ff9f0a" style="background:#ff9f0a"></div>
+        <div class="swatch" data-color="#bf5af2" style="background:#bf5af2"></div>
+        <div class="swatch" data-color="#ff2d55" style="background:#ff2d55"></div>
+        <div class="swatch" data-color="#00d4aa" style="background:#00d4aa"></div>
+      </div>
+    </div>
+    <div class="field">
+      <div class="label">Visualizer</div>
+      <div class="viz-options">
+        <div class="viz-opt active" data-viz="bars"><div class="vi">📊</div><div class="vn">Bars</div></div>
+        <div class="viz-opt" data-viz="circle"><div class="vi">🌀</div><div class="vn">Radial</div></div>
+        <div class="viz-opt" data-viz="mirror"><div class="vi">🪞</div><div class="vn">Mirror</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon">⬇️</div><div class="section-title">Export</div></div>
+    <div class="field">
+      <div class="label">Quality</div>
+      <div class="quality-chips">
+        <div class="chip" data-q="480">480p<div class="chip-l">Fast</div></div>
+        <div class="chip active" data-q="720">720p<div class="chip-l">Best</div></div>
+        <div class="chip" data-q="1080">1080p<div class="chip-l">HD</div></div>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="recordBtn" disabled>
+      <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="7" fill="rgba(255,255,255,.3)"/><circle cx="7" cy="7" r="4" fill="white"/></svg>
+      Start Recording
+    </button>
+    <button class="btn btn-danger" id="stopBtn" disabled>
+      <svg width="14" height="14" viewBox="0 0 14 14"><rect x="2" y="2" width="10" height="10" rx="2" fill="white"/></svg>
+      Stop &amp; Download
+    </button>
+    <div class="steps-row">
+      <div class="step-card"><div class="step-num">1</div><div class="step-text">Upload audio</div></div>
+      <div class="step-card"><div class="step-num">2</div><div class="step-text">Customize style</div></div>
+      <div class="step-card"><div class="step-num">3</div><div class="step-text">Record &amp; save</div></div>
+    </div>
+  </div>
+
+</aside>
+
+<!-- ── Preview ── -->
+<main class="preview-area">
+  <div class="preview-stack">
+
+    <div class="status-pill" id="statusPill">
+      <div class="rec-dot" id="recDot"></div>
+      <span id="recLabel">Live Preview</span>
+      <span id="recTimer" style="font-weight:600;color:var(--text);margin-left:4px;font-family:'DM Mono',monospace"></span>
+    </div>
+
+    <div class="phone-wrap">
+      <svg id="phoneSVG" viewBox="-4 0 414 858" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+        <defs>
+          <clipPath id="scClip"><rect x="8" y="7" width="390" height="844" rx="44"/></clipPath>
+          <clipPath id="avClip"><circle id="avClipC" cx="203" cy="268" r="76"/></clipPath>
+          <radialGradient id="bgGrad" cx="50%" cy="33%" r="80%" gradientUnits="objectBoundingBox">
+            <stop id="bgS1" offset="0%"   stop-color="#1e1e2e"/>
+            <stop id="bgS2" offset="55%"  stop-color="#0f0f1e"/>
+            <stop id="bgS3" offset="100%" stop-color="#050508"/>
+          </radialGradient>
+          <radialGradient id="topGlow" cx="50%" cy="0%" r="55%" gradientUnits="objectBoundingBox">
+            <stop id="topGlowS" offset="0%"   stop-color="#34c759" stop-opacity="0.08"/>
+            <stop                offset="100%" stop-color="#34c759" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="avGlow" cx="203" cy="268" r="130" gradientUnits="userSpaceOnUse">
+            <stop id="avGlowS" offset="0%"   stop-color="#34c759" stop-opacity="0.32"/>
+            <stop               offset="100%" stop-color="#34c759" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+
+        <!-- Phone body -->
+        <rect x="0" y="0" width="406" height="858" rx="52" fill="#111115"/>
+        <rect x="1" y="1" width="404" height="856" rx="51" fill="none" stroke="#2c2c34" stroke-width="2"/>
+
+        <!-- Side buttons -->
+        <rect x="-3" y="98"  width="5" height="28" rx="2.5" fill="#272730"/>
+        <rect x="-3" y="140" width="5" height="58" rx="2.5" fill="#272730"/>
+        <rect x="-3" y="212" width="5" height="58" rx="2.5" fill="#272730"/>
+        <rect x="404" y="138" width="5" height="76" rx="2.5" fill="#272730"/>
+
+        <!-- Screen (clipped) -->
+        <g clip-path="url(#scClip)">
+          <rect x="8" y="7" width="390" height="844" fill="url(#bgGrad)"/>
+          <rect x="8" y="7" width="390" height="844" fill="url(#topGlow)"/>
+
+          <!-- Status Bar -->
+          <text id="svgClock" x="34" y="50" fill="rgba(255,255,255,.9)" font-size="15" font-weight="600" font-family="-apple-system,BlinkMacSystemFont,sans-serif" letter-spacing="-.4">9:41</text>
+          <g fill="rgba(255,255,255,.78)">
+            <rect x="337" y="40" width="3" height="5"  rx="1"/>
+            <rect x="342" y="37" width="3" height="8"  rx="1"/>
+            <rect x="347" y="34" width="3" height="11" rx="1"/>
+            <rect x="352" y="31" width="3" height="14" rx="1"/>
+          </g>
+          <g stroke="rgba(255,255,255,.78)" fill="none" stroke-linecap="round">
+            <path d="M361,44 C363,41 367,39.5 370,39.5 C373,39.5 377,41 379,44" stroke-width="1.8"/>
+            <path d="M363.5,46.5 C365,44.5 367.3,43.5 370,43.5 C372.7,43.5 375,44.5 376.5,46.5" stroke-width="1.8"/>
+            <circle cx="370" cy="49" r="1.6" fill="rgba(255,255,255,.78)" stroke="none"/>
+          </g>
+          <rect x="384" y="37" width="18" height="10" rx="2"   fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.2"/>
+          <rect x="402.5" y="40" width="2"  height="4"  rx="1"   fill="rgba(255,255,255,.4)"/>
+          <rect x="385.5" y="38.5" width="14" height="7"  rx="1.3" fill="rgba(255,255,255,.9)"/>
+
+          <!-- Dynamic Island -->
+          <rect x="155" y="12" width="96" height="28" rx="14" fill="#000"/>
+          <circle cx="234" cy="26" r="6"   fill="#00021D"/>
+          <circle cx="234" cy="26" r="2.2" fill="#1a2cff" opacity=".25"/>
+          <ellipse cx="233" cy="23" rx="2.8" ry="1.2" fill="rgba(255,255,255,.55)" opacity=".7"/>
+
+          <!-- Avatar stage -->
+          <ellipse id="avGlowEl" cx="203" cy="268" rx="120" ry="120" fill="url(#avGlow)"/>
+          <circle class="rp" id="rp0" cx="203" cy="268" r="94"  fill="none" stroke="#34c759" stroke-width="2"   stroke-opacity=".14"/>
+          <circle class="rp" id="rp1" cx="203" cy="268" r="118" fill="none" stroke="#34c759" stroke-width="1.7" stroke-opacity=".10"/>
+          <circle class="rp" id="rp2" cx="203" cy="268" r="142" fill="none" stroke="#34c759" stroke-width="1.4" stroke-opacity=".07"/>
+          <circle class="rp" id="rp3" cx="203" cy="268" r="163" fill="none" stroke="#34c759" stroke-width="1.1" stroke-opacity=".05"/>
+          <circle class="rp" id="rp4" cx="203" cy="268" r="184" fill="none" stroke="#34c759" stroke-width="1"   stroke-opacity=".03"/>
+
+          <image id="svgAvatar"
+            href="https://ui-avatars.com/api/?name=R&background=1a2030&color=34c759&size=300&bold=true"
+            x="127" y="192" width="152" height="152"
+            clip-path="url(#avClip)"
+            preserveAspectRatio="xMidYMid slice"/>
+          <circle id="avBorder" cx="203" cy="268" r="78" fill="none" stroke="#34c759" stroke-width="2.5"/>
+
+          <!-- Caller Info -->
+          <text id="svgName"   x="203" y="397" text-anchor="middle" fill="rgba(255,255,255,.95)" font-size="30" font-weight="300" font-family="-apple-system,BlinkMacSystemFont,sans-serif" letter-spacing="-.5">Rikesh Dahal</text>
+          <text id="svgSub"    x="203" y="423" text-anchor="middle" fill="rgba(255,255,255,.4)"  font-size="15" font-weight="400" font-family="-apple-system,sans-serif">Mobile · Nepal</text>
+          <text id="svgStatus" x="203" y="450" text-anchor="middle" fill="#34c759"               font-size="13" font-weight="500" font-family="-apple-system,sans-serif" opacity=".9">incoming call...</text>
+
+          <!-- Visualizer -->
+          <g id="vizGroup"></g>
+
+          <!-- Control Buttons Row 1 -->
+          <circle cx="93"  cy="588" r="36" fill="rgba(52,52,58,.92)"/>
+          <g transform="translate(93,588)" fill="none" stroke="white" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="-7" y="-13" width="14" height="17" rx="7" fill="none" stroke="white" stroke-width="1.9"/>
+            <path d="M-11,-1 A11,11 0 0,0 11,-1"/>
+            <line x1="0" y1="10" x2="0"  y2="15"/>
+            <line x1="-5" y1="15" x2="5" y2="15"/>
+          </g>
+          <text x="93"  y="636" text-anchor="middle" fill="rgba(255,255,255,.82)" font-size="11.5" font-family="-apple-system,sans-serif">Mute</text>
+
+          <circle cx="203" cy="588" r="36" fill="rgba(52,52,58,.92)"/>
+          <g transform="translate(203,588)" fill="white">
+            <circle cx="-8" cy="-8" r="2.2"/><circle cx="0" cy="-8" r="2.2"/><circle cx="8" cy="-8" r="2.2"/>
+            <circle cx="-8" cy="0"  r="2.2"/><circle cx="0" cy="0"  r="2.2"/><circle cx="8" cy="0"  r="2.2"/>
+            <circle cx="-8" cy="8"  r="2.2"/><circle cx="0" cy="8"  r="2.2"/><circle cx="8" cy="8"  r="2.2"/>
+          </g>
+          <text x="203" y="636" text-anchor="middle" fill="rgba(255,255,255,.82)" font-size="11.5" font-family="-apple-system,sans-serif">Keypad</text>
+
+          <circle cx="313" cy="588" r="36" fill="rgba(52,52,58,.92)"/>
+          <g transform="translate(313,588)">
+            <path d="M-12,-6 L-6,-6 L2,-13 L2,13 L-6,6 L-12,6 Z" fill="white"/>
+            <path d="M7,-6 A9,9 0,0,1 7,6"   stroke="white" stroke-width="1.9" fill="none" stroke-linecap="round"/>
+            <path d="M11,-10 A14,14 0,0,1 11,10" stroke="white" stroke-width="1.9" fill="none" stroke-linecap="round"/>
+          </g>
+          <text x="313" y="636" text-anchor="middle" fill="rgba(255,255,255,.82)" font-size="11.5" font-family="-apple-system,sans-serif">Audio</text>
+
+          <!-- Control Buttons Row 2 -->
+          <circle cx="93"  cy="688" r="36" fill="rgba(52,52,58,.92)"/>
+          <g transform="translate(93,688)" stroke="white" stroke-width="2.4" stroke-linecap="round">
+            <line x1="0" y1="-11" x2="0"   y2="11"/>
+            <line x1="-11" y1="0" x2="11"  y2="0"/>
+          </g>
+          <text x="93"  y="736" text-anchor="middle" fill="rgba(255,255,255,.82)" font-size="11.5" font-family="-apple-system,sans-serif">Add Call</text>
+
+          <circle cx="203" cy="688" r="36" fill="rgba(52,52,58,.92)"/>
+          <g transform="translate(203,688)">
+            <rect x="-14" y="-8" width="17" height="16" rx="3" fill="white"/>
+            <path d="M3,-5 L14,-10 L14,10 L3,5 Z" fill="white"/>
+          </g>
+          <text x="203" y="736" text-anchor="middle" fill="rgba(255,255,255,.82)" font-size="11.5" font-family="-apple-system,sans-serif">Video</text>
+
+          <circle cx="313" cy="688" r="36" fill="rgba(52,52,58,.92)"/>
+          <g transform="translate(313,688)">
+            <circle cx="0" cy="-5" r="7" fill="white"/>
+            <path d="M-13,14 A13,10 0,0,1 13,14" fill="white"/>
+          </g>
+          <text x="313" y="736" text-anchor="middle" fill="rgba(255,255,255,.82)" font-size="11.5" font-family="-apple-system,sans-serif">Contacts</text>
+
+          <!-- End Call -->
+          <circle cx="203" cy="800" r="39" fill="#ff3b30"/>
+          <circle cx="203" cy="800" r="39" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/>
+          <g transform="translate(203,800) rotate(135) scale(1.05) translate(-12,-12)">
+            <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02L6.62 10.79z" fill="white"/>
+          </g>
+
+          <!-- Home indicator -->
+          <rect x="143" y="844" width="120" height="4" rx="2" fill="rgba(255,255,255,.22)"/>
+          <rect x="8" y="7" width="390" height="844" rx="44" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="1.5"/>
+        </g>
+
+        <!-- Outer rim highlight -->
+        <rect x="0" y="0" width="406" height="858" rx="52" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="1.5"/>
+      </svg>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="progress-wrap">
       <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--sub);margin-top:6px">
+      <div class="progress-times">
         <span id="timeElapsed">0:00</span>
         <span id="timeTotal">0:00</span>
       </div>
     </div>
+
   </div>
+
+  <!-- Hidden canvas for video recording capture -->
+  <canvas id="recCanvas" width="390" height="844"
+    style="position:absolute;opacity:0;pointer-events:none;top:0;left:0;width:1px;height:1px;"></canvas>
 </main>
 
+</div><!-- .app -->
+
+<!-- Mobile FAB -->
+<button class="mobile-toggle" id="mobileToggle" aria-label="Open settings">⚙️</button>
+
 <script>
-// ── State ──
-const state = {
-  bgColor: '#0a0a1a',
-  accentColor: '#34c759',
-  callerName: 'Rikesh Dahal',
-  callerSub: 'Mobile • Nepal',
-  vizStyle: 'bars',
-  audioBuffer: null,
-  audioSrc: null,
-  avatarImg: null,
-  isRecording: false,
-  callDuration: 0,
-  callTimer: null,
+// ══════════════════════════════════════════════
+//  State
+// ══════════════════════════════════════════════
+const S = {
+  bgColor:'#080818', accentColor:'#34c759',
+  callerName:'Rikesh Dahal', callerSub:'Mobile · Nepal',
+  vizStyle:'bars', quality:'720',
+  audioSrc:null, isRecording:false,
+  callDuration:0, callTimer:null,
+  avatarImg:null,
 };
 
-// ── Canvas Setup ──
-const canvas = document.getElementById('phoneCanvas');
-const ctx = canvas.getContext('2d');
-const W = 390, H = 844;
-canvas.width = W; canvas.height = H;
-canvas.style.width = Math.min(W, 390) + 'px';
-canvas.style.height = Math.min(H, 844) + 'px';
+const SVG_NS = 'http://www.w3.org/2000/svg';
 
-// ── Audio Context ──
+// ── SVG refs ──
+const svgAvatar    = document.getElementById('svgAvatar');
+const avBorder     = document.getElementById('avBorder');
+const avClipC      = document.getElementById('avClipC');
+const avGlowEl     = document.getElementById('avGlowEl');
+const avGlowS      = document.getElementById('avGlowS');
+const svgName      = document.getElementById('svgName');
+const svgSub       = document.getElementById('svgSub');
+const svgStatus    = document.getElementById('svgStatus');
+const svgClock     = document.getElementById('svgClock');
+const bgS1         = document.getElementById('bgS1');
+const bgS2         = document.getElementById('bgS2');
+const bgS3         = document.getElementById('bgS3');
+const topGlowS     = document.getElementById('topGlowS');
+const vizGroup     = document.getElementById('vizGroup');
+const rippleEls    = [0,1,2,3,4].map(i=>document.getElementById(`rp${i}`));
+
+// ── Canvas for recording ──
+const recCanvas = document.getElementById('recCanvas');
+const rCtx      = recCanvas.getContext('2d');
+
+// ── Audio ──
 let audioCtx, analyser, source, audioElement;
-let frequencyData = new Uint8Array(128);
-let animFrame;
-let ripplePhase = 0;
+let freqData = new Uint8Array(128);
+let ripPhase = 0, animFrame;
+let bars = [];
 
-// ── Load default avatar ──
-const defaultAvatar = new Image();
-defaultAvatar.crossOrigin = 'anonymous';
-defaultAvatar.src = 'https://ui-avatars.com/api/?name=R&background=1a1a2e&color=34c759&size=300&bold=true';
-defaultAvatar.onload = () => { state.avatarImg = defaultAvatar; drawIdle(); };
+// ══════════════════════════════════════════════
+//  Mobile sidebar toggle
+// ══════════════════════════════════════════════
+const sidebar = document.getElementById('sidebar');
+const backdrop = document.getElementById('sidebarBackdrop');
+const mobileToggle = document.getElementById('mobileToggle');
 
-function drawIdle() {
-  ripplePhase += 0.03;
-  drawFrame(new Uint8Array(128));
-  if (!state.audioSrc) requestAnimationFrame(drawIdle);
+function openSidebar() {
+  sidebar.classList.add('open');
+  backdrop.classList.add('visible');
+  mobileToggle.classList.add('open');
+  mobileToggle.textContent = '✕';
+  document.body.style.overflow = 'hidden';
 }
-drawIdle();
+function closeSidebar() {
+  sidebar.classList.remove('open');
+  backdrop.classList.remove('visible');
+  mobileToggle.classList.remove('open');
+  mobileToggle.textContent = '⚙️';
+  document.body.style.overflow = '';
+}
+mobileToggle.addEventListener('click', () => {
+  sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+});
+backdrop.addEventListener('click', closeSidebar);
 
-// ── Draw Frame ──
-function drawFrame(freq) {
-  ctx.clearRect(0, 0, W, H);
+// Touch swipe down to close on mobile
+let touchStartY = 0;
+sidebar.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, {passive:true});
+sidebar.addEventListener('touchmove', e => {
+  const dy = e.touches[0].clientY - touchStartY;
+  if (dy > 60) closeSidebar();
+}, {passive:true});
 
-  // Background gradient
-  const bgGrad = ctx.createRadialGradient(W/2, H*0.35, 0, W/2, H*0.35, H*0.7);
-  const hex = state.bgColor;
-  bgGrad.addColorStop(0, shiftColor(hex, 30));
-  bgGrad.addColorStop(1, shiftColor(hex, -10));
-  ctx.fillStyle = bgGrad;
-  ctx.fillRect(0, 0, W, H);
-
-  // Subtle noise overlay
-  ctx.fillStyle = 'rgba(255,255,255,0.012)';
-  for(let i=0;i<200;i++){
-    ctx.fillRect(Math.random()*W, Math.random()*H, 1, 1);
-  }
-
-  // Status bar
-  ctx.fillStyle = 'rgba(255,255,255,0.7)';
-  ctx.font = '600 14px Nunito, sans-serif';
-  ctx.textAlign = 'left';
-  const now = new Date();
-  ctx.fillText(`${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`, 24, 36);
-  ctx.textAlign = 'right';
-  ctx.fillText('●●● ▲▼', W-24, 36);
-
-  // Pulsing ripple rings
-  const accent = state.accentColor;
-  const avgVol = freq.length ? freq.reduce((a,b)=>a+b,0)/freq.length/255 : 0;
-  const pulse = 1 + avgVol * 0.4;
-
-  for(let r=0;r<4;r++){
-    const phase = (ripplePhase - r*0.6) % (Math.PI*2);
-    const t = (Math.sin(phase)*0.5+0.5);
-    const radius = 90 + r*42 + t*24*pulse;
-    const alpha = (1-t)*0.25 + avgVol*0.15;
-    ctx.beginPath();
-    ctx.arc(W/2, 310, radius, 0, Math.PI*2);
-    ctx.strokeStyle = hexToRgba(accent, alpha);
-    ctx.lineWidth = 2 + (1-t)*3;
-    ctx.stroke();
-  }
-
-  // Avatar circle
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(W/2, 310, 78 + avgVol*8, 0, Math.PI*2);
-  ctx.clip();
-  if(state.avatarImg) {
-    ctx.drawImage(state.avatarImg, W/2-78, 310-78, 156, 156);
+// ══════════════════════════════════════════════
+//  Visualizer bar/path elements
+// ══════════════════════════════════════════════
+function initVizBars() {
+  while (vizGroup.firstChild) vizGroup.removeChild(vizGroup.firstChild);
+  bars = [];
+  if (S.vizStyle === 'circle') {
+    const p = document.createElementNS(SVG_NS,'path');
+    p.setAttribute('stroke-width','2');
+    p.setAttribute('stroke-linecap','round');
+    p.setAttribute('stroke-linejoin','round');
+    vizGroup.appendChild(p);
+    bars.push(p);
   } else {
-    ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(W/2-78, 310-78, 156, 156);
-    ctx.fillStyle = accent;
-    ctx.font = 'bold 60px Nunito';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(state.callerName.charAt(0).toUpperCase(), W/2, 310);
-  }
-  ctx.restore();
-
-  // Avatar border glow
-  ctx.beginPath();
-  ctx.arc(W/2, 310, 80 + avgVol*8, 0, Math.PI*2);
-  ctx.strokeStyle = hexToRgba(accent, 0.6 + avgVol*0.4);
-  ctx.lineWidth = 3;
-  ctx.stroke();
-
-  // Caller name
-  ctx.textBaseline = 'alphabetic';
-  ctx.textAlign = 'center';
-  ctx.fillStyle = 'rgba(255,255,255,0.95)';
-  ctx.font = '700 34px Nunito, sans-serif';
-  ctx.fillText(state.callerName, W/2, 430);
-
-  // Sub text
-  ctx.fillStyle = 'rgba(255,255,255,0.5)';
-  ctx.font = '400 16px Nunito, sans-serif';
-  ctx.fillText(state.callerSub, W/2, 458);
-
-  // Call duration
-  const dur = formatTime(state.callDuration);
-  ctx.fillStyle = hexToRgba(accent, 0.9);
-  ctx.font = '600 15px Nunito, sans-serif';
-  ctx.fillText(state.audioSrc ? dur : 'incoming call...', W/2, 490);
-
-  // ── Visualizer ──
-  drawVisualizer(freq, avgVol, accent);
-
-  // ── Call Buttons ──
-  drawCallButtons(accent);
-
-  // Home indicator
-  ctx.fillStyle = 'rgba(255,255,255,0.35)';
-  ctx.beginPath();
-  ctx.roundRect(W/2-65, H-14, 130, 5, 3);
-  ctx.fill();
-}
-
-function drawVisualizer(freq, avgVol, accent) {
-  const style = state.vizStyle;
-  const vizY = 640;
-  const vizH = 80;
-
-  if(style === 'bars') {
-    const barCount = 48;
-    const barW = 4;
-    const gap = (W - 80) / barCount - barW;
-    for(let i=0;i<barCount;i++){
-      const idx = Math.floor(i * freq.length / barCount);
-      const val = freq[idx] / 255;
-      const h = Math.max(4, val * vizH);
-      const x = 40 + i*(barW+gap);
-      const alpha = 0.4 + val*0.6;
-      ctx.fillStyle = hexToRgba(accent, alpha);
-      ctx.beginPath();
-      ctx.roundRect(x, vizY - h, barW, h, 2);
-      ctx.fill();
+    const count = S.vizStyle==='mirror' ? 104 : 52;
+    for (let i=0; i<count; i++) {
+      const r = document.createElementNS(SVG_NS,'rect');
+      r.setAttribute('rx','2'); r.setAttribute('ry','2');
+      vizGroup.appendChild(r); bars.push(r);
     }
-  } else if(style === 'mirror') {
-    const barCount = 48;
-    const barW = 4;
-    const gap = (W - 80) / barCount - barW;
-    for(let i=0;i<barCount;i++){
-      const idx = Math.floor(i * freq.length / barCount);
-      const val = freq[idx] / 255;
-      const h = Math.max(3, val * vizH * 0.5);
-      const x = 40 + i*(barW+gap);
-      const alpha = 0.35 + val*0.65;
-      ctx.fillStyle = hexToRgba(accent, alpha);
-      ctx.beginPath();
-      ctx.roundRect(x, vizY - h, barW, h, 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.roundRect(x, vizY, barW, h, 2);
-      ctx.fill();
-    }
-  } else if(style === 'circle') {
-    const cx = W/2, cy = vizY - 10;
-    const rBase = 32;
-    const pts = 64;
-    ctx.beginPath();
-    for(let i=0;i<pts;i++){
-      const idx = Math.floor(i * freq.length / pts);
-      const val = freq[idx] / 255;
-      const angle = (i / pts) * Math.PI * 2 - Math.PI/2;
-      const r = rBase + val * 38;
-      const x = cx + Math.cos(angle) * r;
-      const y = cy + Math.sin(angle) * r;
-      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
-    }
-    ctx.closePath();
-    ctx.strokeStyle = hexToRgba(accent, 0.85);
-    ctx.lineWidth = 2.5;
-    ctx.stroke();
-    ctx.fillStyle = hexToRgba(accent, 0.08);
-    ctx.fill();
   }
 }
+initVizBars();
 
-function drawCallButtons(accent) {
-  const btnY = 740;
-  const buttons = [
-    { x: W/2-130, icon: '🔇', label: 'mute', color: 'rgba(255,255,255,0.15)' },
-    { x: W/2, icon: '📵', label: 'end', color: '#ff3b30', big: true },
-    { x: W/2+130, icon: '🔊', label: 'speaker', color: 'rgba(255,255,255,0.15)' },
-  ];
+// ══════════════════════════════════════════════
+//  Idle freq (sine wave when no audio loaded)
+// ══════════════════════════════════════════════
+function idleFreq() {
+  const d = new Uint8Array(128);
+  for (let i=0; i<128; i++) {
+    d[i] = Math.round((Math.sin(ripPhase*1.6+i*0.18)*0.4+0.55)*55+4);
+  }
+  return d;
+}
 
-  buttons.forEach(b => {
-    const r = b.big ? 40 : 34;
-    ctx.beginPath();
-    ctx.arc(b.x, btnY, r, 0, Math.PI*2);
-    ctx.fillStyle = b.color;
-    ctx.fill();
-    ctx.font = `${b.big ? 26 : 22}px serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(b.icon, b.x, btnY);
-    ctx.fillStyle = 'rgba(255,255,255,0.5)';
-    ctx.font = '11px Nunito, sans-serif';
-    ctx.textBaseline = 'alphabetic';
-    ctx.fillText(b.label, b.x, btnY + r + 16);
+// ══════════════════════════════════════════════
+//  Colour helpers
+// ══════════════════════════════════════════════
+function hexRgba(hex, a) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+function shiftColor(hex, amount) {
+  const clamp = v => Math.max(0,Math.min(255,v));
+  const r = clamp(parseInt(hex.slice(1,3),16)+amount);
+  const g = clamp(parseInt(hex.slice(3,5),16)+amount);
+  const b = clamp(parseInt(hex.slice(5,7),16)+amount);
+  return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+}
+function formatTime(s) {
+  const m = Math.floor(s/60), ss = Math.floor(s%60);
+  return `${m}:${String(ss).padStart(2,'0')}`;
+}
+
+// ══════════════════════════════════════════════
+//  Main SVG update
+// ══════════════════════════════════════════════
+function updateSVG(freq) {
+  const avg = freq.reduce((a,b)=>a+b,0)/freq.length/255;
+
+  const n = new Date();
+  svgClock.textContent = `${n.getHours()}:${String(n.getMinutes()).padStart(2,'0')}`;
+
+  bgS1.setAttribute('stop-color', shiftColor(S.bgColor,28));
+  bgS2.setAttribute('stop-color', shiftColor(S.bgColor,8));
+  bgS3.setAttribute('stop-color', shiftColor(S.bgColor,-4));
+  topGlowS.setAttribute('stop-color', S.accentColor);
+  avGlowS.setAttribute('stop-color', S.accentColor);
+
+  const glowOp = Math.min(0.55, 0.28+avg*0.38);
+  avGlowS.setAttribute('stop-opacity', glowOp.toFixed(2));
+  const glowR = 118+avg*24;
+  avGlowEl.setAttribute('rx', glowR.toFixed(0));
+  avGlowEl.setAttribute('ry', glowR.toFixed(0));
+
+  const avR = (76+avg*5).toFixed(1);
+  avClipC.setAttribute('r', avR);
+  avBorder.setAttribute('r', (parseFloat(avR)+2.5).toFixed(1));
+  avBorder.setAttribute('stroke', hexRgba(S.accentColor, 0.65+avg*0.35));
+  avBorder.setAttribute('stroke-width', (2+avg*1.5).toFixed(1));
+
+  rippleEls.forEach((el,r)=>{
+    const phase = (ripPhase - r*0.45 + Math.PI*4) % (Math.PI*2);
+    const t = Math.sin(phase)*0.5+0.5;
+    const pulse = 1+avg*0.28;
+    const rad = 94+r*32+t*17*pulse;
+    const alpha = (1-t)*0.16+avg*0.07;
+    el.setAttribute('r', rad.toFixed(1));
+    el.setAttribute('stroke', S.accentColor);
+    el.setAttribute('stroke-opacity', alpha.toFixed(3));
+    el.setAttribute('stroke-width', (1.6+(1-t)*1.8).toFixed(1));
   });
 
-  // Answer button
-  ctx.beginPath();
-  ctx.arc(W/2+130, btnY, 34, 0, Math.PI*2);
-  ctx.fillStyle = accent;
-  ctx.fill();
-  ctx.font = '22px serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('📞', W/2+130, btnY);
-  ctx.fillStyle = 'rgba(255,255,255,0.5)';
-  ctx.font = '11px Nunito, sans-serif';
-  ctx.textBaseline = 'alphabetic';
-  ctx.fillText('answer', W/2+130, btnY + 50);
+  svgStatus.setAttribute('fill', hexRgba(S.accentColor,0.88));
+  updateViz(freq, avg);
 }
 
-// ── Audio Setup ──
-function setupAudio(file) {
-  if(audioCtx) { audioCtx.close(); audioCtx = null; }
-  if(audioElement) { audioElement.pause(); audioElement.src = ''; }
+function updateViz(freq, avg) {
+  const n=52, bw=4.5, sx=45, tw=316;
+  const gap=(tw - n*bw)/(n-1);
+  const cy=490;
 
+  if (S.vizStyle==='bars') {
+    for (let i=0; i<n; i++) {
+      const v=freq[Math.floor(i*freq.length/n)]/255;
+      const h=Math.max(3,v*75), x=sx+i*(bw+gap);
+      bars[i].setAttribute('x',  x.toFixed(1));
+      bars[i].setAttribute('y',  (cy-h).toFixed(1));
+      bars[i].setAttribute('width',  bw);
+      bars[i].setAttribute('height', h.toFixed(1));
+      bars[i].setAttribute('fill', hexRgba(S.accentColor, 0.28+v*0.72));
+    }
+  } else if (S.vizStyle==='mirror') {
+    for (let i=0; i<n; i++) {
+      const v=freq[Math.floor(i*freq.length/n)]/255;
+      const h=Math.max(2,v*38), x=sx+i*(bw+gap);
+      const a=hexRgba(S.accentColor, 0.22+v*0.78);
+      bars[i].setAttribute('x',   x.toFixed(1)); bars[i].setAttribute('y',   (cy-h).toFixed(1));
+      bars[i].setAttribute('width', bw); bars[i].setAttribute('height', h.toFixed(1));
+      bars[i].setAttribute('fill', a);
+      bars[n+i].setAttribute('x',   x.toFixed(1)); bars[n+i].setAttribute('y',   cy.toFixed(1));
+      bars[n+i].setAttribute('width', bw); bars[n+i].setAttribute('height', h.toFixed(1));
+      bars[n+i].setAttribute('fill', a);
+    }
+  } else {
+    const cx=203, cyC=490, nn=80, rb=26;
+    let d='';
+    for (let i=0; i<nn; i++) {
+      const v=freq[Math.floor(i*freq.length/nn)]/255;
+      const a=(i/nn)*Math.PI*2-Math.PI/2;
+      const r=rb+v*42;
+      const px=cx+Math.cos(a)*r, py=cyC+Math.sin(a)*r;
+      d += i===0 ? `M${px.toFixed(1)},${py.toFixed(1)}` : `L${px.toFixed(1)},${py.toFixed(1)}`;
+    }
+    d+='Z';
+    bars[0].setAttribute('d',d);
+    bars[0].setAttribute('fill',    hexRgba(S.accentColor, 0.06+avg*0.1));
+    bars[0].setAttribute('stroke',  hexRgba(S.accentColor, 0.85));
+  }
+}
+
+// ══════════════════════════════════════════════
+//  Canvas draw for recording
+// ══════════════════════════════════════════════
+function drawCanvas(freq) {
+  const W=390, H=844;
+  rCtx.clearRect(0,0,W,H);
+  const avg=freq.reduce((a,b)=>a+b,0)/freq.length/255;
+
+  const bg=rCtx.createRadialGradient(W/2,H*0.33,0,W/2,H*0.33,H*.82);
+  bg.addColorStop(0,shiftColor(S.bgColor,28));
+  bg.addColorStop(.55,shiftColor(S.bgColor,8));
+  bg.addColorStop(1,shiftColor(S.bgColor,-4));
+  rCtx.fillStyle=bg; rCtx.fillRect(0,0,W,H);
+
+  const tg=rCtx.createRadialGradient(W/2,0,0,W/2,0,H*.5);
+  tg.addColorStop(0,hexRgba(S.accentColor,.08)); tg.addColorStop(1,'rgba(0,0,0,0)');
+  rCtx.fillStyle=tg; rCtx.fillRect(0,0,W,H);
+
+  const n=new Date();
+  rCtx.fillStyle='rgba(255,255,255,.85)';
+  rCtx.font='600 15px -apple-system,sans-serif';
+  rCtx.textAlign='left'; rCtx.textBaseline='alphabetic';
+  rCtx.fillText(`${n.getHours()}:${String(n.getMinutes()).padStart(2,'0')}`,26,43);
+
+  rCtx.fillStyle='#000';
+  rCtx.beginPath(); rCtx.roundRect(W/2-48,10,96,28,14); rCtx.fill();
+
+  for (let r=0;r<5;r++) {
+    const phase=(ripPhase-r*.45+Math.PI*4)%(Math.PI*2);
+    const t=Math.sin(phase)*.5+.5, pulse=1+avg*.28;
+    const rad=94+r*32+t*17*pulse, alpha=(1-t)*.16+avg*.07;
+    rCtx.beginPath(); rCtx.arc(W/2,268,rad,0,Math.PI*2);
+    rCtx.strokeStyle=hexRgba(S.accentColor,alpha);
+    rCtx.lineWidth=1.6+(1-t)*1.8; rCtx.stroke();
+  }
+
+  const ag=rCtx.createRadialGradient(W/2,268,70,W/2,268,130);
+  ag.addColorStop(0,hexRgba(S.accentColor,.28+avg*.38)); ag.addColorStop(1,'rgba(0,0,0,0)');
+  rCtx.fillStyle=ag; rCtx.fillRect(W/2-130,148,260,260);
+
+  rCtx.save();
+  const avR=76+avg*5;
+  rCtx.beginPath(); rCtx.arc(W/2,268,avR,0,Math.PI*2); rCtx.clip();
+  if (S.avatarImg) rCtx.drawImage(S.avatarImg,W/2-avR,268-avR,avR*2,avR*2);
+  else {
+    rCtx.fillStyle='#1a2030'; rCtx.fillRect(0,0,W,H);
+    rCtx.fillStyle=S.accentColor;
+    rCtx.font='bold 56px sans-serif'; rCtx.textAlign='center'; rCtx.textBaseline='middle';
+    rCtx.fillText(S.callerName.charAt(0).toUpperCase(),W/2,268);
+  }
+  rCtx.restore();
+  rCtx.beginPath(); rCtx.arc(W/2,268,avR+2.5,0,Math.PI*2);
+  rCtx.strokeStyle=hexRgba(S.accentColor,.65+avg*.35);
+  rCtx.lineWidth=2+avg*1.5; rCtx.stroke();
+
+  rCtx.textAlign='center'; rCtx.textBaseline='alphabetic';
+  rCtx.fillStyle='rgba(255,255,255,.95)';
+  rCtx.font='300 30px -apple-system,sans-serif'; rCtx.fillText(S.callerName,W/2,397);
+  rCtx.fillStyle='rgba(255,255,255,.4)';
+  rCtx.font='400 15px sans-serif'; rCtx.fillText(S.callerSub,W/2,423);
+  rCtx.fillStyle=hexRgba(S.accentColor,.88);
+  rCtx.font='500 13px sans-serif';
+  rCtx.fillText(S.isRecording ? formatTime(S.callDuration) : (S.audioSrc?'0:00':'incoming call...'),W/2,450);
+
+  canvasViz(freq,avg);
+
+  rCtx.fillStyle='rgba(255,255,255,.2)';
+  rCtx.beginPath(); rCtx.roundRect(W/2-60,H-14,120,4,2); rCtx.fill();
+}
+
+function canvasViz(freq,avg) {
+  const n=52,bw=4.5,sx=45,tw=316,gap=(tw-n*bw)/(n-1),cy=490,style=S.vizStyle;
+  if(style==='bars'){
+    for(let i=0;i<n;i++){
+      const v=freq[Math.floor(i*freq.length/n)]/255, h=Math.max(3,v*75), x=sx+i*(bw+gap);
+      rCtx.fillStyle=hexRgba(S.accentColor,.28+v*.72);
+      rCtx.beginPath(); rCtx.roundRect(x,cy-h,bw,h,2); rCtx.fill();
+    }
+  } else if(style==='mirror'){
+    for(let i=0;i<n;i++){
+      const v=freq[Math.floor(i*freq.length/n)]/255, h=Math.max(2,v*38), x=sx+i*(bw+gap);
+      rCtx.fillStyle=hexRgba(S.accentColor,.22+v*.78);
+      rCtx.beginPath(); rCtx.roundRect(x,cy-h,bw,h,2); rCtx.fill();
+      rCtx.beginPath(); rCtx.roundRect(x,cy,bw,h,2); rCtx.fill();
+    }
+  } else {
+    const cx=195,cyC=490,nn=80,rb=26;
+    rCtx.beginPath();
+    for(let i=0;i<nn;i++){
+      const v=freq[Math.floor(i*freq.length/nn)]/255, a=(i/nn)*Math.PI*2-Math.PI/2;
+      const r=rb+v*42, px=cx+Math.cos(a)*r, py=cyC+Math.sin(a)*r;
+      i===0?rCtx.moveTo(px,py):rCtx.lineTo(px,py);
+    }
+    rCtx.closePath();
+    rCtx.strokeStyle=hexRgba(S.accentColor,.85); rCtx.lineWidth=2; rCtx.stroke();
+    rCtx.fillStyle=hexRgba(S.accentColor,.06+avg*.1); rCtx.fill();
+  }
+}
+
+// ══════════════════════════════════════════════
+//  Animation loop
+// ══════════════════════════════════════════════
+function loop() {
+  if (analyser) analyser.getByteFrequencyData(freqData);
+  ripPhase += 0.024;
+  const freq = S.audioSrc ? freqData : idleFreq();
+  updateSVG(freq);
+  if (S.isRecording) drawCanvas(freq);
+  animFrame = requestAnimationFrame(loop);
+}
+loop();
+
+// ══════════════════════════════════════════════
+//  Audio setup
+// ══════════════════════════════════════════════
+function setupAudio(file) {
+  if (audioCtx) { audioCtx.close(); audioCtx=null; }
+  if (audioElement) { audioElement.pause(); audioElement.src=''; }
   const url = URL.createObjectURL(file);
   audioElement = new Audio();
   audioElement.src = url;
   audioElement.crossOrigin = 'anonymous';
-
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  audioCtx = new (window.AudioContext||window.webkitAudioContext)();
   analyser = audioCtx.createAnalyser();
   analyser.fftSize = 256;
   source = audioCtx.createMediaElementSource(audioElement);
   source.connect(analyser);
   analyser.connect(audioCtx.destination);
-  frequencyData = new Uint8Array(analyser.frequencyBinCount);
-
-  state.audioSrc = url;
+  freqData = new Uint8Array(analyser.frequencyBinCount);
+  S.audioSrc = url;
   document.getElementById('recordBtn').disabled = false;
-
+  setDots(2);
   audioElement.addEventListener('loadedmetadata', () => {
     document.getElementById('timeTotal').textContent = formatTime(audioElement.duration);
   });
@@ -621,146 +839,165 @@ function setupAudio(file) {
   });
 }
 
-function renderLoop() {
-  if(analyser) analyser.getByteFrequencyData(frequencyData);
-  ripplePhase += 0.03;
-  drawFrame(frequencyData);
-  animFrame = requestAnimationFrame(renderLoop);
-}
-
-// ── Recording ──
+// ══════════════════════════════════════════════
+//  Recording
+// ══════════════════════════════════════════════
 let mediaRecorder, chunks = [];
 
 async function startRecording() {
-  if(!state.audioSrc) return;
-  if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-
-  state.isRecording = true;
-  state.callDuration = 0;
+  if (!S.audioSrc) return;
+  if (audioCtx?.state === 'suspended') audioCtx.resume();
+  S.isRecording = true;
+  S.callDuration = 0;
   chunks = [];
-
-  cancelAnimationFrame(animFrame);
-  renderLoop();
   audioElement.currentTime = 0;
   audioElement.play();
+  S.callTimer = setInterval(() => { S.callDuration++; updateRTimer(); }, 1000);
+  svgStatus.textContent = '0:00';
 
-  state.callTimer = setInterval(() => { state.callDuration++; }, 1000);
-
-  document.getElementById('recDot').classList.add('active');
-  document.getElementById('recLabel').textContent = 'REC';
+  document.getElementById('recDot').classList.add('live');
+  document.getElementById('recLabel').textContent = 'Recording';
+  document.getElementById('statusPill').classList.add('recording');
   document.getElementById('recordBtn').disabled = true;
   document.getElementById('stopBtn').disabled = false;
+  document.getElementById('stopBtn').classList.add('recording');
+  setDots(3);
 
-  const stream = canvas.captureStream(30);
-
-  // Mix audio into stream
+  const stream = recCanvas.captureStream(30);
   const dest = audioCtx.createMediaStreamDestination();
   source.connect(dest);
-  const audioTracks = dest.stream.getAudioTracks();
-  audioTracks.forEach(t => stream.addTrack(t));
-
-  const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
+  dest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
+  const mt = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
     ? 'video/webm;codecs=vp9,opus'
-    : MediaRecorder.isTypeSupported('video/webm')
-    ? 'video/webm' : 'video/mp4';
-
-  mediaRecorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 5000000 });
-  mediaRecorder.ondataavailable = e => { if(e.data.size>0) chunks.push(e.data); };
+    : MediaRecorder.isTypeSupported('video/webm') ? 'video/webm' : 'video/mp4';
+  mediaRecorder = new MediaRecorder(stream, { mimeType: mt, videoBitsPerSecond: 5000000 });
+  mediaRecorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
   mediaRecorder.start(100);
-
-  audioElement.onended = () => stopRecording();
+  audioElement.onended = stopRecording;
 }
 
 function stopRecording() {
-  if(!state.isRecording) return;
-  state.isRecording = false;
-  clearInterval(state.callTimer);
+  if (!S.isRecording) return;
+  S.isRecording = false;
+  clearInterval(S.callTimer);
   audioElement.pause();
-  cancelAnimationFrame(animFrame);
   mediaRecorder.stop();
-
   mediaRecorder.onstop = () => {
     const blob = new Blob(chunks, { type: chunks[0].type });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${state.callerName.replace(/\s+/g,'_')}_call.webm`;
+    a.download = `${S.callerName.replace(/\s+/g,'_')}_call.webm`;
     a.click();
   };
-
-  document.getElementById('recDot').classList.remove('active');
-  document.getElementById('recLabel').textContent = 'Done!';
+  document.getElementById('recDot').classList.remove('live');
+  document.getElementById('recLabel').textContent = 'Done ✓';
+  document.getElementById('recTimer').textContent = '';
+  document.getElementById('statusPill').classList.remove('recording');
   document.getElementById('recordBtn').disabled = false;
   document.getElementById('stopBtn').disabled = true;
-
-  drawIdle();
+  document.getElementById('stopBtn').classList.remove('recording');
+  svgStatus.textContent = S.audioSrc ? '0:00' : 'incoming call...';
 }
 
-// ── Event Listeners ──
+function updateRTimer() {
+  document.getElementById('recTimer').textContent = formatTime(S.callDuration);
+  svgStatus.textContent = formatTime(S.callDuration);
+}
+
+// ══════════════════════════════════════════════
+//  Step dots
+// ══════════════════════════════════════════════
+function setDots(active) {
+  [1,2,3].forEach(i => {
+    const d = document.getElementById('dot'+i);
+    d.classList.remove('active','done');
+    if (i < active) d.classList.add('done');
+    else if (i === active) d.classList.add('active');
+  });
+}
+
+// ══════════════════════════════════════════════
+//  UI Events
+// ══════════════════════════════════════════════
 document.getElementById('audioInput').addEventListener('change', e => {
-  const f = e.target.files[0];
-  if(!f) return;
+  const f = e.target.files[0]; if (!f) return;
   document.getElementById('audioName').textContent = f.name;
+  document.getElementById('audioZone').classList.add('has-file');
   setupAudio(f);
 });
 
 document.getElementById('photoInput').addEventListener('change', e => {
-  const f = e.target.files[0];
-  if(!f) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    const img = new Image();
-    img.onload = () => { state.avatarImg = img; };
-    img.src = ev.target.result;
-  };
-  reader.readAsDataURL(f);
+  const f = e.target.files[0]; if (!f) return;
+  const url = URL.createObjectURL(f);
+  document.getElementById('avatarSide').src = url;
+  document.getElementById('photoZone').classList.add('has-file');
+  svgAvatar.setAttribute('href', url);
+  const img = new Image();
+  img.onload = () => { S.avatarImg = img; };
+  img.src = url;
 });
 
-document.getElementById('callerName').addEventListener('input', e => { state.callerName = e.target.value; });
-document.getElementById('callerSub').addEventListener('input', e => { state.callerSub = e.target.value; });
-document.getElementById('vizStyle').addEventListener('change', e => { state.vizStyle = e.target.value; });
+document.getElementById('callerName').addEventListener('input', e => {
+  S.callerName = e.target.value || 'Caller';
+  svgName.textContent = S.callerName;
+  document.getElementById('namePrev').textContent = S.callerName;
+  const init = S.callerName.charAt(0).toUpperCase();
+  if (!S.avatarImg) {
+    const newSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(init)}&background=1a2030&color=34c759&size=300&bold=true`;
+    svgAvatar.setAttribute('href', newSrc);
+    document.getElementById('avatarSide').src = newSrc.replace('300','150');
+  }
+});
 
-// Color swatches
+document.getElementById('callerSub').addEventListener('input', e => {
+  S.callerSub = e.target.value;
+  svgSub.textContent = S.callerSub;
+  document.getElementById('subPrev').textContent = S.callerSub;
+});
+
+// Background color swatches
 document.getElementById('bgColors').addEventListener('click', e => {
-  const sw = e.target.closest('.color-swatch');
-  if(!sw) return;
-  document.querySelectorAll('#bgColors .color-swatch').forEach(s => s.classList.remove('active'));
+  const sw = e.target.closest('.swatch'); if (!sw) return;
+  document.querySelectorAll('#bgColors .swatch').forEach(s => s.classList.remove('active'));
   sw.classList.add('active');
-  state.bgColor = sw.dataset.color;
+  S.bgColor = sw.dataset.color;
 });
+
+// Accent color swatches
 document.getElementById('accentColors').addEventListener('click', e => {
-  const sw = e.target.closest('.color-swatch');
-  if(!sw) return;
-  document.querySelectorAll('#accentColors .color-swatch').forEach(s => s.classList.remove('active'));
+  const sw = e.target.closest('.swatch'); if (!sw) return;
+  document.querySelectorAll('#accentColors .swatch').forEach(s => s.classList.remove('active'));
   sw.classList.add('active');
-  state.accentColor = sw.dataset.color;
+  S.accentColor = sw.dataset.color;
+});
+
+// Visualizer options
+document.querySelectorAll('.viz-opt').forEach(opt => {
+  opt.addEventListener('click', () => {
+    document.querySelectorAll('.viz-opt').forEach(o => o.classList.remove('active'));
+    opt.classList.add('active');
+    S.vizStyle = opt.dataset.viz;
+    initVizBars();
+  });
+});
+
+// Quality chips
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    S.quality = chip.dataset.q;
+    // Update canvas resolution
+    const h = S.quality === '480' ? 480 : S.quality === '1080' ? 844 : 844;
+    const w = S.quality === '480' ? 222 : S.quality === '1080' ? 390 : 390;
+    recCanvas.width = w;
+    recCanvas.height = h;
+  });
 });
 
 document.getElementById('recordBtn').addEventListener('click', startRecording);
 document.getElementById('stopBtn').addEventListener('click', stopRecording);
-
-// ── Helpers ──
-function formatTime(s) {
-  s = Math.floor(s||0);
-  return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
-}
-
-function hexToRgba(hex, alpha) {
-  const r = parseInt(hex.slice(1,3),16);
-  const g = parseInt(hex.slice(3,5),16);
-  const b = parseInt(hex.slice(5,7),16);
-  return `rgba(${r},${g},${b},${alpha})`;
-}
-
-function shiftColor(hex, amount) {
-  let r = parseInt(hex.slice(1,3),16);
-  let g = parseInt(hex.slice(3,5),16);
-  let b = parseInt(hex.slice(5,7),16);
-  r = Math.max(0,Math.min(255,r+amount));
-  g = Math.max(0,Math.min(255,g+amount));
-  b = Math.max(0,Math.min(255,b+amount));
-  return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
-}
 </script>
 </body>
 </html>
